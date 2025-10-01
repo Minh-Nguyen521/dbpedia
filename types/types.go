@@ -50,3 +50,9 @@ type HealthResponse struct {
 	Status string `json:"status"`
 	Time   string `json:"time"`
 }
+
+// ValidateResponse represents the validation response
+type ValidateResponse struct {
+	Valid   bool   `json:"valid"`
+	Message string `json:"message,omitempty"`
+}

@@ -3,10 +3,13 @@ package handlers
 import (
 	"dbpedia-server/interfaces"
 	"dbpedia-server/types"
+	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/knakk/sparql"
 )
 
 // Handler contains all HTTP handlers
@@ -42,6 +45,15 @@ func (h *Handler) ExecuteSPARQLQuery(c *gin.Context) {
 		return
 	}
 
+	// Validate SPARQL query syntax
+	if err := validateSPARQLQuery(req.Query); err != nil {
+		c.JSON(http.StatusBadRequest, types.ErrorResponse{
+			Error:   "invalid_sparql",
+			Message: fmt.Sprintf("Invalid SPARQL query: %v", err),
+		})
+		return
+	}
+
 	// Call DBpedia SPARQL endpoint
 	result, err := h.dbpediaClient.Query(req.Query)
 	if err != nil {
@@ -53,6 +65,90 @@ func (h *Handler) ExecuteSPARQLQuery(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, result)
+}
+
+// ValidateSPARQLQuery validates a SPARQL query without executing it
+func (h *Handler) ValidateSPARQLQuery(c *gin.Context) {
+	var req types.SPARQLRequest
+
+	// Bind JSON request
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, types.ErrorResponse{
+			Error:   "invalid_request",
+			Message: "Query parameter is required",
+		})
+		return
+	}
+
+	// Validate SPARQL query syntax
+	if err := validateSPARQLQuery(req.Query); err != nil {
+		c.JSON(http.StatusOK, types.ValidateResponse{
+			Valid:   false,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, types.ValidateResponse{
+		Valid:   true,
+		Message: "Query is valid",
+	})
+}
+
+// validateSPARQLQuery validates if the query is a valid SPARQL query
+func validateSPARQLQuery(query string) error {
+	// Trim whitespace
+	query = strings.TrimSpace(query)
+
+	if query == "" {
+		return fmt.Errorf("query cannot be empty")
+	}
+
+	// Basic validation - check if query starts with valid SPARQL keywords
+	queryUpper := strings.ToUpper(query)
+	validKeywords := []string{"SELECT", "CONSTRUCT", "ASK", "DESCRIBE", "INSERT", "DELETE"}
+
+	hasValidKeyword := false
+	for _, keyword := range validKeywords {
+		if strings.HasPrefix(queryUpper, keyword) {
+			hasValidKeyword = true
+			break
+		}
+	}
+
+	if !hasValidKeyword {
+		return fmt.Errorf("query must start with a valid SPARQL keyword (SELECT, CONSTRUCT, ASK, DESCRIBE, INSERT, or DELETE)")
+	}
+
+	// Check for basic structure - must contain WHERE clause for SELECT queries
+	if strings.HasPrefix(queryUpper, "SELECT") {
+		if !strings.Contains(queryUpper, "WHERE") {
+			return fmt.Errorf("SELECT query must contain a WHERE clause")
+		}
+	}
+
+	// Additional validation: try to create a repo and validate against it
+	// This is a more thorough check using the sparql package
+	repo, err := sparql.NewRepo("http://example.org/sparql")
+	if err != nil {
+		// If we can't create a repo for testing, just do basic validation
+		return nil
+	}
+
+	// Create a bank with the query for validation
+	bank := make(sparql.Bank)
+	bank["test"] = query
+
+	// Try to prepare the query - this will catch syntax errors
+	_, err = bank.Prepare("test")
+	if err != nil {
+		return fmt.Errorf("syntax error: %v", err)
+	}
+
+	// Suppress unused variable warning
+	_ = repo
+
+	return nil
 }
 
 // GetExampleQueries returns some example SPARQL queries

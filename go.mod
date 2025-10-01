@@ -15,6 +15,9 @@ require (
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.4 // indirect
+	github.com/knakk/digest v0.0.0-20160404164910-fd45becddc49 // indirect
+	github.com/knakk/rdf v0.0.0-20190304171630-8521bf4c5042 // indirect
+	github.com/knakk/sparql v0.0.0-20240119140508-255b851aa040 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
