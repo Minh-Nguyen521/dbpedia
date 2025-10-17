@@ -133,9 +133,7 @@ SELECT ?type (COUNT(?s) as ?count) WHERE {
 } GROUP BY ?type ORDER BY DESC(?count) LIMIT 10
 ```
 
-## 💻 Code Examples
-
-### Example 1: Simple Integration (cURL)
+#### 5. Simple Integration (cURL)
 
 ```bash
 # Get information about Paris
@@ -147,7 +145,9 @@ curl -X POST http://localhost:8080/api/v1/sparql \
 ```
 
 ## DBPEDIA REPO
+
 https://github.com/aniiyengar/dbpedia
+
 https://github.com/garfix/nli-go
 
 # THIS CURRENT PROJECT'S STRUCTURE
