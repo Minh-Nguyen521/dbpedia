@@ -58,10 +58,6 @@ func (s *Server) SetupRoutes() {
 		// Example queries endpoint
 		v1.GET("/examples", s.handler.GetExampleQueries)
 	}
-
-	// Backward compatibility - keep old routes
-	s.router.POST("/sparql", s.handler.ExecuteSPARQLQuery)
-	s.router.GET("/examples", s.handler.GetExampleQueries)
 }
 
 // Start starts the HTTP server
@@ -72,8 +68,6 @@ func (s *Server) Start() error {
 	fmt.Printf("  - POST /api/v1/sparql\n")
 	fmt.Printf("  - POST /api/v1/validate\n")
 	fmt.Printf("  - GET  /api/v1/examples\n")
-	fmt.Printf("  - POST /sparql (legacy)\n")
-	fmt.Printf("  - GET  /examples (legacy)\n")
 
 	return s.router.Run(s.port)
 }
