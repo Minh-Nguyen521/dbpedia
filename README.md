@@ -6,8 +6,6 @@
 
 ### Key Facts About DBpedia
 
-- **Scope**: Contains structured data from over 125 Wikipedia language editions
-- **Scale**: Describes more than 6 million entities (people, places, organizations, etc.)
 - **Interconnected**: Links to other datasets like Wikidata, GeoNames, and more
 - **Free & Open**: Available under open licenses (CC BY-SA and GFDL)
 - **Real-world Use**: Powers semantic search, chatbots, recommendation systems, and AI applications
